@@ -26,7 +26,7 @@ zmodload -a zsh/mapfile mapfile
 
 # Load plugins
 source $HOME/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source $HOME/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting-dracula.sh
+#source $HOME/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting-dracula.sh
 source $HOME/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # Completions
