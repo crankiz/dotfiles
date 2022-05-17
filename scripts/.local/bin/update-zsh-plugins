@@ -3,7 +3,7 @@
 function clone_or_pull {
     local repo_path="${1}"
     local project="$(echo "${repo_path}" | cut -d"/" -f2)"
-    local project_path="${XDG_CONFIG_HOME}/.zsh/plugins/${project}"
+    local project_path="${XDG_CONFIG_HOME}/zsh/plugins/${project}"
 
     if cd "${project_path}" > /dev/null 2>&1; then
         echo "Updating ${repo_path}..."
