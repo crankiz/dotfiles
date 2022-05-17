@@ -24,9 +24,9 @@ function no_system_packages() {
 cat << EOF
 System package installation isn't supported with your distro.
 Please install any dependent packages on your own. You can view the list at:
-    https://github.com/crankiz/dotfiles/blob/master/install
+    https://raw.githubusercontent.com/crankiz/dotfiles/main/install.sh
 Then re-run the script and explicitly skip installing system packages:
-    bash <(curl -sS https://raw.githubusercontent.com/crankiz/dotfiles/master/install) --skip-system-packages
+    bash <(curl -sS https://raw.githubusercontent.com/crankiz/dotfiles/main/install.sh) --skip-system-packages
 EOF
 
 exit 1
