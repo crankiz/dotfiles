@@ -117,7 +117,7 @@ git clone https://github.com/crankiz/dotfiles "${clone_path}"
 ###############################################################################
 
 cd "${clone_path}"
-stow --ignore=install.sh ./*
+stow --ignore=(install.sh|README.md) *
 
 ###############################################################################
 # Install zsh plugins and auto completion
