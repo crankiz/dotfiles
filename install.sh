@@ -117,7 +117,7 @@ git clone https://github.com/crankiz/dotfiles "${clone_path}"
 ###############################################################################
 
 cd "${clone_path}"
-stow *
+stow -t ~ */
 
 ###############################################################################
 # Install zsh plugins and auto completion
