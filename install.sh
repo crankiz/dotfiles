@@ -11,10 +11,12 @@ export GIT_CONFIG=$XDG_CONFIG_HOME/git/config
 export STARSHIP_CONFIG=$XDG_CONFIG_HOME/starship/config.toml
 
 apt_packages="curl exa fzf git neovim stow zsh bat jq"
-apt_packages_optional="python python-pip whois ipcalc bind nmap docker terraform kubectl rust"
+#apt_packages_optional="python python-pip whois ipcalc bind nmap docker terraform kubectl rust"
+apt_packages_optional=""
 
 pacman_packages="curl exa fzf git neovim stow zsh bat jq"
-pacman_packages_optional="python python-pip whois ipcalc bind nmap docker terraform kubectl rust"
+#pacman_packages_optional="python python-pip whois ipcalc bind nmap docker terraform kubectl rust"
+pacman_packages_optional=""
 
 ###############################################################################
 # Detect OS and distro type
