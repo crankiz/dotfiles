@@ -118,11 +118,24 @@ cd "${clone_path}"
 stow --ignore=install.sh ./*
 
 ###############################################################################
-# Install zsh plugins
+# Install zsh plugins and auto completion
 ###############################################################################
 
-clone_or_pull "zdharma-continuum/fast-syntax-highlighting"
-clone_or_pull "zsh-users/zsh-autosuggestions"
+$HOME/.local/bin/update-zsh-plugins
+
+git_raw="https://raw.githubusercontent.com"
+
+curl ${git_raw}/chubin/cheat.sh/master/share/zsh.txt \
+    --create-dirs \
+    -o $XDG_CONFIG_HOME/zsh/completions/_cht
+
+curl ${git_raw}/zsh-users/zsh-completions/master/src/_openssl \
+    --create-dirs \
+    -o $XDG_CONFIG_HOME/zsh/completions/_openssl
+
+curl ${git_raw}/ogham/exa/master/completions/zsh/_exa \
+    --create-dirs \
+    -o  $XDG_CONFIG_HOME/zsh/completions/_exa
 
 ###############################################################################
 # Install Plug (Vim plugin manager)
