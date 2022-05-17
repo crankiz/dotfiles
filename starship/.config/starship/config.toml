@@ -1,0 +1,102 @@
+format = """
+$custom\
+$username\
+$hostname\
+$shlvl\
+$kubernetes\
+$directory\
+$git_branch\
+$git_commit\
+$git_state\
+$git_metrics\
+$git_status\
+$hg_branch\
+$docker_context\
+$dotnet \
+$package\
+$golang\
+$nodejs\
+$python\
+$rust\
+$terraform\
+$env_var\
+$cmd_duration\
+$line_break\
+$lua\
+$jobs\
+$battery\
+$time\
+$status\
+$shell\
+$character"""
+
+#scan_timeout = 20000
+#command_timeout = 20000
+
+add_newline = false
+
+[line_break]
+disabled = true
+
+[username]
+format = "[$user]($style) "
+
+[hostname]
+ssh_only = true
+style = "white"
+format = "($style) "
+
+#[character]
+#success_symbol = "[🜏](green) "
+#error_symbol = "[🜏](red) "
+
+
+# Packages
+[kubernetes]
+symbol = "☸"
+
+[docker_context]
+symbol = ""
+
+[golang]
+symbol = ""
+
+[nodejs]
+symbol = ""
+
+[python]
+symbol = ""
+
+[rust]
+symbol = ""
+
+[terraform]
+symbol = ""
+format = "[$symbol $version$workspace]($style) "
+
+[lua]
+symbol = ""
+
+
+# Custom icons
+[custom.wsl]
+symbol = ""
+format = "[$symbol](#00AFEF) "
+when = """ uname -r | grep -o "WSL" """
+
+[custom.ubuntu]
+symbol = ""
+format = "[$symbol](#D64613) "
+when = """ echo $DISTRO | grep ubuntu """
+
+[custom.arch]
+symbol = ""
+format = "[$symbol](#017BF3) "
+when = """ echo $DISTRO | grep arch """
+
+[custom.kali]
+symbol = ""
+format = "[$symbol](#3477E8) "
+when = """ echo $DISTRO | grep kali """
+
+
