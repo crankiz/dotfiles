@@ -1,5 +1,4 @@
-nvim/.config/nvim/plugged/*
-zsh/.config/zsh/.zcompdump
-zsh/.config/zsh/completions/*
-zsh/.config/zsh/plugins/*
-scripts/.local/share/*
+**/nvim/plugged/*
+*zcompdump*
+**/completions/_*
+

@@ -25,9 +25,9 @@ setopt    incappendhistory        # Immediately append to the history file
 zmodload -a zsh/mapfile mapfile
 
 # Load plugins
-source $HOME/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-#source $HOME/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting-dracula.sh
-source $HOME/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $ZDOTDIR/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source $ZDOTDIR/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $ZDOTDIR/plugins/zsh-quotes/zsh-quotes.zsh
 
 # Completions
 autoload -Uz compinit && compinit
@@ -36,4 +36,11 @@ zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 
 # Run scripts
-echo ${(%):-%F{magenta}}$(quotes)${(%):-%f}
+echo ${(%):-%F{magenta}}${quoter_selection[RANDOM % ${#quoter_selection} + 1]}${(%):-%f}
+unset quoter_selection
+
+
+
+
+
+

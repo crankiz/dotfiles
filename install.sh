@@ -123,7 +123,9 @@ stow -t ~ */
 # Install zsh plugins and auto completion
 ###############################################################################
 
-$HOME/.local/bin/update-zsh-plugins
+source $ZDOTDIR/zsh-functions
+clone_or_pull "zsh-users/zsh-syntax-highlighting"
+clone_or_pull "zsh-users/zsh-autosuggestions"
 
 git_raw="https://raw.githubusercontent.com"
 
