@@ -12,8 +12,8 @@ source $ZDOTDIR/zsh-prompt
 source $ZDOTDIR/zsh-keybindings
 
 # History settings
+HISTFILE=$XDG_CACHE_HOME/.zhistory        # Where to save history to disk
 HISTSIZE=10000                              # How many lines of history to keep in memory
-HISTFILE=$XDG_CACHE_HOME/zsh/history        # Where to save history to disk
 SAVEHIST=10000                              # Number of history entries to save to disk
 HISTDUP=erase                               # Erase duplicates in the history file
 setopt    hist_ignore_all_dups    # Erase oldest dupliate
