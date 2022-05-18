@@ -1,4 +1,6 @@
 **/nvim/plugged/*
 *zcompdump*
 **/completions/_*
+**/zsh/plugins/*
+!zsh-quotes.zsh
 
