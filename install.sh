@@ -123,7 +123,7 @@ stow -t ~ */
 # Install zsh plugins and auto completion
 ###############################################################################
 
-source $ZDOTDIR/zsh-functions
+source "${clone_path}/zsh/.config/zsh/zsh-functions"
 clone_or_pull "zsh-users/zsh-syntax-highlighting"
 clone_or_pull "zsh-users/zsh-autosuggestions"
 
