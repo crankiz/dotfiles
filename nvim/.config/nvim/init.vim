@@ -1,7 +1,8 @@
 " -------------------- Plugins (VimPlug) ------------------------------------
 call plug#begin('$XDG_CONFIG_HOME/nvim/plugged')
 Plug 'junegunn/limelight.vim' " Syntax
-Plug 'morhetz/gruvbox' " Color-schemes   
+Plug 'morhetz/gruvbox' " Color-schemes
+Plug 'aca/completion-tabnine', { 'do': './install.sh' }
 call plug#end()
 colorscheme gruvbox 
 
