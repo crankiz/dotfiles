@@ -145,7 +145,7 @@ curl ${git_raw}/ogham/exa/master/completions/zsh/_exa \
 # Install starship
 ###############################################################################
 
-curl -sS https://starship.rs/install.sh | sh
+command -v starship > /dev/null || curl -sS https://starship.rs/install.sh | sh
 
 ###############################################################################
 # Install Plug (Vim plugin manager)
