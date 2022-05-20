@@ -9,5 +9,11 @@ quoter_selection=(
   "“It’s time to kick ass and chew bubble gum…and I’m all outta gum.” — Duke Nukem"
   "“If you find yourself in a hole, the first thing to do is stop diggin'.” — John Marston"
   "“My Log Does Not Judge.” — Log Lady"
-  "“I like to complain and do nothing to make things better.” — Kurt Cobain" 
+  "“I like to complain and do nothing to make things better.” — Kurt Cobain"
+  "“I'm sorry, Dave. I'm afraid I can't do that.” - HAL, 2001: A Space Odyssey"
+  "“If I'm not back in five minutes, just wait longer.” - Ace Ventura"
+  "“Gimme some sugar, baby.” - Ash"
+  "“I’m Going To Need Those TPS Reports ASAP. So, If You Could Do That, That’d Be Greaaaaat.” - Bill Lumbergh"
+  "“Dom ser mig som en blandning av Pippi Långstrump och Al Capone.” - Clark Olofsson"
+  "“Det är fina killar. Arbetarklasskillar. Fast dom har inga arbeten längre då men... ah, så nu är dom ju bara fina killar!” - Pölsa"
 )
