@@ -1,145 +1,160 @@
 #!/usr/bin/env bash
-set -e 
 
+###############################################################################
+# Set up Environment
+###############################################################################
+
+# Define variables
 export XDG_CONFIG_HOME=$HOME/.config
-export XDG_CACHE_HOME=$HOME/.cache
-export XDG_DATA_HOME=$HOME/.local/share
-export XDG_STATE_HOME=$HOME/.local/state
-export XDG_RUNTIME_DIR=/run/user/$UID
-export WGETRC=$XDG_CONFIG_HOME/wgetrc
-export GIT_CONFIG=$XDG_CONFIG_HOME/git/config
-export STARSHIP_CONFIG=$XDG_CONFIG_HOME/starship/config.toml
+export ZDOTDIR=$XDG_CONFIG_HOME/zsh
 
-apt_packages="curl exa fzf git neovim stow zsh bat jq"
-#apt_packages_optional="python python-pip whois ipcalc bind nmap docker terraform kubectl rust"
-apt_packages_optional=""
-
-pacman_packages="curl exa fzf git neovim stow zsh bat jq"
-#pacman_packages_optional="python python-pip whois ipcalc bind nmap docker terraform kubectl rust"
-pacman_packages_optional=""
+repo_url="https://github.com/crankiz/dotfiles"
+# Dotfiles location
+target_folder="$HOME/.dotfiles"
+# List of packages to check and install
+packages=("curl" "exa" "fzf" "git" "neovim" "stow" "zsh" "bat" "jq")
 
 ###############################################################################
-# Detect OS and distro type
+# Check if the script is run as root
 ###############################################################################
 
-function no_system_packages() {
-cat << EOF
-System package installation isn't supported with your distro.
-Please install any dependent packages on your own. You can view the list at:
-    https://raw.githubusercontent.com/crankiz/dotfiles/main/install.sh
-Then re-run the script and explicitly skip installing system packages:
-    bash <(curl -sS https://raw.githubusercontent.com/crankiz/dotfiles/main/install.sh) --skip-system-packages
-EOF
-
-exit 1
-}
-
-###############################################################################
-# Install packages using your distro package manager
-###############################################################################
-
-distro=$(awk -F '=' '/^ID=/ {print $2}' /etc/*-release)
-
-function apt_install_packages {
-    # shellcheck disable=SC2086
-    sudo apt-get update && sudo apt-get install -y ${apt_packages} ${apt_packages_optional}
-}
-
-function pacman_install_packages {
-    # shellcheck disable=SC2086
-    sudo pacman -Syyu && sudo pacman -Syyu ${pacman_packages} ${pacman_packages_optional}
-}
-
-function display_packages {
-    if [ "${distro}" == "ubuntu" ]; then
-        echo "${apt_packages} ${apt_packages_optional}"
-    elif [ "${distro}" == "arch" ]; then
-        echo "${pacman_packages} ${pacman_packages_optional}"
-    else
-        no_system_packages
-    fi
-}
-
-if [ -z "${skip_system_packages}" ]; then
-cat << EOF
-If you choose yes, all of the system packages below will be installed:
-$(display_packages)
-If you choose no, the above packages will not be installed and this script
-will exit. This gives you a chance to edit the list of packages if you don't
-agree with any of the decisions.
-The packages listed after zsh are technically optional but are quite useful.
-Keep in mind if you don't install pwgen you won't be able to generate random
-passwords using a custom alias that's included in these dotfiles.
-EOF
-    while true; do
-        read -rp "Do you want to install the above packages? (y/n) " yn
-        case "${yn}" in
-            [Yy]*)
-                if [ "${distro}" == "ubuntu" ]; then
-                    apt_install_packages
-                elif [ "${distro}" == "arch" ]; then
-                    pacman_install_packages
-                else
-                    no_system_packages
-                fi
-
-                break;;
-            [Nn]*) exit 0;;
-            *) echo "Please answer y or n";;
-        esac
-    done
+if [ "$EUID" -ne 0 ]; then
+    SUDO="sudo -H"
 else
-    echo "System package installation was skipped!"
+    SUDO=""
 fi
 
 ###############################################################################
-# Clone dotfiles
+# Function to check if a package is installed
 ###############################################################################
 
-read -rep $'\nWhere do you want to clone these dotfiles to [~/.dotfiles]? ' clone_path
-clone_path="${clone_path:-"${HOME}/.dotfiles"}"
-
-# Ensure path doesn't exist.
-while [ -e "${clone_path}" ]; do
-    read -rep $'\nPath exists, try again? (y) ' y
-    case "${y}" in
-        [Yy]*)
-
-            break;;
-        *) echo "Please answer y or CTRL+c the script to abort everything";;
-    esac
-done
-
-git clone https://github.com/crankiz/dotfiles "${clone_path}"
+is_package_installed() {
+    command -v "$1" >/dev/null 2>&1
+}
 
 ###############################################################################
-# Stow dotfiles
+# Function to install packages using the appropriate package manager
 ###############################################################################
 
-cd "${clone_path}"
-stow -t ~ */
+install_packages() {
+    local package_manager
+
+    # Check which package manager is available
+    if is_package_installed "apt"; then
+        package_manager="$SUDO apt install -y"
+    elif is_package_installed "dnf"; then
+        package_manager="$SUDO dnf install -y"
+    elif is_package_installed "yum"; then
+        package_manager="$SUDO yum install -y"
+    elif is_package_installed "pacman"; then
+        package_manager="$SUDO pacman -Sy --noconfirm"
+    elif is_package_installed "apk"; then
+        package_manager="$SUDO apk add"
+    else
+        echo "Error: Unsupported package manager. Please install the packages manually."
+        exit 1
+    fi
+
+    # Install missing packages
+    for package in "${packages[@]}"; do
+        if ! is_package_installed "$package"; then
+            echo "Installing $package..."
+            $package_manager "$package" || {
+                echo "Error: Failed to install $package."
+                exit 1
+            }
+        else
+            echo "$package is already installed."
+        fi
+    done
+}
+
+###############################################################################
+# Check if Git is installed
+###############################################################################
+
+if ! command -v git > /dev/null 2>&1; then
+    echo "Error: 'git' is not installed. Please install git and try again."
+    exit 1
+fi
+
+# Call the install_packages function
+install_packages
+echo "Package installation complete."
+
+###############################################################################
+# Clone and Stow Dotfiles
+###############################################################################
+
+# Check if the cloning was successful
+if git clone "$repo_url" "$target_folder"; then
+    echo "Repository cloned successfully."
+    # Change to the dotfiles directory
+    cd "$target_folder" || exit
+    # Use GNU Stow to create symlinks
+    stow -v -R ./*
+    echo "Symlinks created successfully."
+else
+    echo "Error: Cloning failed."
+fi
 
 ###############################################################################
 # Install zsh plugins and auto completion
 ###############################################################################
 
-source "${clone_path}/zsh/.config/zsh/zsh-functions"
+# Function to clone or pull a Git repository
+clone_or_pull() {
+    local repo_path="${1}"
+    local project="$(echo "${repo_path}" | cut -d"/" -f2)"
+    local project_path="${XDG_CONFIG_HOME}/zsh/plugins/${project}"
+
+    # Ensure the directory exists or create it
+    mkdir -p "${project_path}"
+
+    # Check if git is installed
+    if ! command -v git > /dev/null 2>&1; then
+        echo "Error: 'git' is not installed. Please install git and try again."
+        return 1
+    fi
+
+    if cd "${project_path}" > /dev/null 2>&1; then
+        echo "Updating ${repo_path}..."
+        git pull
+        echo
+        cd - > /dev/null 2>&1
+    else
+        echo "Installing ${repo_path}..."
+        git clone "https://github.com/${repo_path}" "${project_path}"
+        echo
+    fi
+}
+
 clone_or_pull "zsh-users/zsh-syntax-highlighting"
 clone_or_pull "zsh-users/zsh-autosuggestions"
 
+# Function to download a file using curl
+get_auto_completion() {
+    local url="$1"
+    local target_path="$2"
+
+    # Ensure the directory exists or create it
+    mkdir -p "$(dirname "$target_path")"
+
+    echo "Downloading $url to $target_path..."
+    curl -fsSL "$url" --create-dirs -o "$target_path"
+
+    if [ $? -eq 0 ]; then
+        echo "Download successful."
+    else
+        echo "Error: Download failed."
+    fi
+}
+
 git_raw="https://raw.githubusercontent.com"
 
-curl ${git_raw}/chubin/cheat.sh/master/share/zsh.txt \
-    --create-dirs \
-    -o $XDG_CONFIG_HOME/zsh/completions/_cht
-
-curl ${git_raw}/zsh-users/zsh-completions/master/src/_openssl \
-    --create-dirs \
-    -o $XDG_CONFIG_HOME/zsh/completions/_openssl
-
-curl ${git_raw}/ogham/exa/master/completions/zsh/_exa \
-    --create-dirs \
-    -o  $XDG_CONFIG_HOME/zsh/completions/_exa
+get_auto_completion "${git_raw}/chubin/cheat.sh/master/share/zsh.txt" "$ZDOTDIR/completions/_cht"
+get_auto_completion "${git_raw}/zsh-users/zsh-completions/master/src/_openssl" "$ZDOTDIR/completions/_openssl"
+get_auto_completion "${git_raw}/ogham/exa/master/completions/zsh/_exa" "$ZDOTDIR/completions/_exa"
 
 ###############################################################################
 # Install starship
@@ -158,23 +173,24 @@ sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.
 # Install Vim plugins
 ###############################################################################
 
-printf "\n\nInstalling Vim plugins...\n"
+# Ensure the directory exists or create it
+echo -e "\n\nInstalling Vim plugins..."
 nvim -E +PlugInstall +qall || true
 
 ###############################################################################
 # Change default shell to zsh
 ###############################################################################
 
-chsh -s "$(command -v zsh)"
+$SUDO chsh -s "$(command -v zsh)"
 
 ###############################################################################
-# Done!
+# Completion Message
 ###############################################################################
 
 cat << EOF
 Everything was installed successfully!
 You can safely close this terminal.
-The next time you open your terminal zsh will be ready to go!
+The next time you open your terminal, zsh will be ready to go!
 EOF
 
 exit 0
