@@ -92,7 +92,7 @@ if git clone "$repo_url" "$target_folder"; then
     # Change to the dotfiles directory
     cd "$target_folder" || exit
     # Use GNU Stow to create symlinks
-    stow -v -R ./*
+    stow -t ~ */
     echo "Symlinks created successfully."
 else
     echo "Error: Cloning failed."
