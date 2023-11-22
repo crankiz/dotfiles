@@ -69,15 +69,6 @@ install_packages() {
     done
 }
 
-###############################################################################
-# Check if Git is installed
-###############################################################################
-
-if ! command -v git > /dev/null 2>&1; then
-    echo "Error: 'git' is not installed. Please install git and try again."
-    exit 1
-fi
-
 # Call the install_packages function
 install_packages
 echo "Package installation complete."
