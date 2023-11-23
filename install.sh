@@ -69,7 +69,10 @@ install_packages() {
     done
 }
 
+###############################################################################
 # Call the install_packages function
+###############################################################################
+
 install_packages
 echo "Package installation complete."
 
