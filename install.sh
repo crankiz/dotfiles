@@ -175,7 +175,7 @@ nvim -E +PlugInstall +qall || true
 # Change default shell to zsh
 ###############################################################################
 
-$SUDO chsh -s "$(command -v zsh)"
+$SUDO chsh -s $(which zsh) $SUDO_USER
 
 ###############################################################################
 # Completion Message
