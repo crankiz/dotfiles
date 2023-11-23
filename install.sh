@@ -96,36 +96,6 @@ fi
 # Install zsh plugins and auto completion
 ###############################################################################
 
-# Function to clone or pull a Git repository
-clone_or_pull() {
-    local repo_path="${1}"
-    local project="$(echo "${repo_path}" | cut -d"/" -f2)"
-    local project_path="${XDG_CONFIG_HOME}/zsh/plugins/${project}"
-
-    # Ensure the directory exists or create it
-    mkdir -p "${project_path}"
-
-    # Check if git is installed
-    if ! command -v git > /dev/null 2>&1; then
-        echo "Error: 'git' is not installed. Please install git and try again."
-        return 1
-    fi
-
-    if cd "${project_path}" > /dev/null 2>&1; then
-        echo "Updating ${repo_path}..."
-        git pull
-        echo
-        cd - > /dev/null 2>&1
-    else
-        echo "Installing ${repo_path}..."
-        git clone "https://github.com/${repo_path}" "${project_path}"
-        echo
-    fi
-}
-
-clone_or_pull "zsh-users/zsh-syntax-highlighting"
-clone_or_pull "zsh-users/zsh-autosuggestions"
-
 # Function to download a file using curl
 get_auto_completion() {
     local url="$1"
