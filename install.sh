@@ -81,7 +81,7 @@ echo "Package installation complete."
 ###############################################################################
 
 # Check if the cloning was successful
-if git clone "$repo_url" "$target_folder"; then
+if git clone --recurse-submodules "$repo_url" "$target_folder"; then
     echo "Repository cloned successfully."
     # Change to the dotfiles directory
     cd "$target_folder" || exit
