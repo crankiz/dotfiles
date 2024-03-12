@@ -28,7 +28,7 @@ zmodload -a zsh/mapfile mapfile
 source $ZDOTDIR/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source $ZDOTDIR/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source $ZDOTDIR/plugins/zsh-quotes/zsh-quotes.zsh
-source $ZDOTDIR/plugins/zsh-extract/extract.plugin.zsh:wq
+source $ZDOTDIR/plugins/zsh-extract/extract.plugin.zsh
 
 # Completions
 autoload -Uz compinit && compinit
