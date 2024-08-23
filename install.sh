@@ -12,7 +12,7 @@ repo_url="https://github.com/crankiz/dotfiles"
 # Dotfiles location
 target_folder="$HOME/.dotfiles"
 # List of packages to check and install
-packages=("curl" "exa" "fzf" "git" "neovim" "stow" "zsh" "bat" "jq")
+packages=("curl" "eza" "fzf" "git" "neovim" "stow" "zsh" "bat" "jq")
 
 ###############################################################################
 # Check if the script is run as root
@@ -118,7 +118,7 @@ git_raw="https://raw.githubusercontent.com"
 
 get_auto_completion "${git_raw}/chubin/cheat.sh/master/share/zsh.txt" "$ZDOTDIR/completions/_cht"
 get_auto_completion "${git_raw}/zsh-users/zsh-completions/master/src/_openssl" "$ZDOTDIR/completions/_openssl"
-get_auto_completion "${git_raw}/ogham/exa/master/completions/zsh/_exa" "$ZDOTDIR/completions/_exa"
+get_auto_completion "${git_raw}/eza-community/eza/main/completions/zsh/_eza" "$ZDOTDIR/completions/_eza"
 
 ###############################################################################
 # Install starship
