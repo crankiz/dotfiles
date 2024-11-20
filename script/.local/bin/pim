@@ -1,20 +1,35 @@
 #!/bin/bash
-azList=$(az-pim-cli list)
-azSub=$(grep -oP '(?<=^==\s)(.+)(?=\s==$)' <<<"${azList}" | fzf)
+azSub=$(az-pim-cli list resource | grep -oP '(?<=^==\s)(.+)(?=\s==$)' | sort | fzf)
 
-azRole=$(
-        awk "/${azSub}/ {flag=1; next} flag && /^\t/ {print; next} flag && !/^\t/ {flag=0}" <<<"${azList}" |
-                grep -oP '(\w.*$)' | sort -u | uniq | fzf
-)
+azRole=$(az-pim-cli list resource | grep -oP '^\s*-\s\K.+' | sort -u |uniq |fzf)
 
-if [[ "${azRole}" == "Owner" || "${azRole}" == "Role Based Access Control Administrator" ]]; then
+case "${azRole}" in
+    "Reader")
+        duration=0
+        ;;
+    "Contributor")
+        duration=600
+        ;;
+    "Key Vault Administrator")
+        duration=240
+        ;;
+    "Owner")
         duration=60
-fi
-
-if [[ -z "${azRole}" ]]; then
+        ;;
+    "Role Based Access Control Administrator")
+        duration=60
+        ;;
+    "Storage Blob Data Contributor")
+        duration=600
+        ;;
+    "Storage Blob Data Owner")
+        duration=240
+        ;;
+    *)
         az account set --subscription "${azSub}"
         exit 0
-fi
+        ;;
+esac
 
-az account set --subscription "${azSub}" &&
-        az-pim-cli activate --name "${azSub}" --role "${azRole}" --duration ${duration:-600} --reason "DevOps stuff"
+az account set --subscription "${azSub}"
+az-pim-cli activate resource --name "${azSub}" --role "${azRole}" --duration ${duration} --reason "DevOps stuff"

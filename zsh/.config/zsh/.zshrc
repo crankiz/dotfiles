@@ -2,6 +2,8 @@
 
 # Disable vi mode
 
+
+
 # Disable beeps
 unsetopt BEEP
 
@@ -48,8 +50,12 @@ zmodload -a zsh/mapfile mapfile
 
 # ~~~~~~ PLUGINS AND FUNCTIONS  ~~~~~~
 # source <(fzf --zsh) Supported in version > 0.48.0  
-source $ZDOTDIR/plugins/*.zsh
-fpath=($ZDOTDIR/functions $fpath)
+source $ZDOTDIR/plugins/zsh-quotes/zsh-quotes.zsh
+source $ZDOTDIR/plugins/zsh-extract/extract.plugin.zsh
+source $ZDOTDIR/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $ZDOTDIR/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# fpath=($ZDOTDIR/functions $fpath)
 
 # ~~~~~~ COMPLETION ~~~~~~
 autoload -Uz compinit && compinit
@@ -66,15 +72,16 @@ source $ZDOTDIR/completions/*
 
 # ~~~~~~ EXPORTS ~~~~~~
 # User-specific tools
-path+=(
-  $HOME/.cargo/bin       # Rust binaries
-  $HOME/.local/bin       # User-installed binaries
+path=(
+  $path
+  $HOME/.local/bin
+  $HOME/.cargo/bin
 )
 
 # Deduplicate and export
-typeset -U path           # Remove duplicates
-export PATH=$^path(N-/)   # Filter non-existent paths
-
+typeset -U path
+path=($^path(N-/))
+export PATH
 
 # Dynamically fetch the distro (relevant in terminal sessions)
 export DISTRO=$(awk -F '=' '/^ID=/ {print $2}' /etc/*-release)
@@ -85,6 +92,7 @@ alias vim="nvim"
 alias history="history -i"
 
 # ~~~~~~ KEY BINDINGS ~~~~~~
+bindkey -e  # Set Emacs key bindings (default)
 bindkey "^[[H"  beginning-of-line # Home
 bindkey "^[[F"  end-of-line # End
 bindkey "^[[3~" delete-char # Delete
@@ -97,7 +105,5 @@ unsetopt BEEP # Disable beep
 autoload colors && colors
 eval "$(zoxide init zsh)"
 eval "$(starship init zsh)"
-echo ${(%):-%F{magenta}}$(quotes)${(%):-%f}
-
-
-
+# echo ${(%):-%F{magenta}}$(quotes)${(%):-%f}
+echo ${(%):-%F{magenta}}${quoter_selection[RANDOM % ${#quoter_selection} + 1]}${(%):-%f}

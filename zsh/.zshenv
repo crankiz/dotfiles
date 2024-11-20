@@ -28,7 +28,8 @@ export BAT_THEME="gruvbox-dark"
 
 # ~~~~~~ PATHS ~~~~~~
 # Core paths for system-wide tools and Go
-export PATH=$HOME/.local/bin:$HOME/.dotnet:$HOME/.dotnet/tools:/usr/local/go/bin:/usr/local/bin:$PATH
+export PATH=$HOME/.local/bin:$HOME/.dotnet:$HOME/.dotnet/tools:/usr/local/go/bin:$PATH
+
 # Go-specific paths
 export GOPATH=$XDG_DATA_HOME/go
 export GOMODCACHE=$XDG_CACHE_HOME/go/mod

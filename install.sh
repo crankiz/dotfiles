@@ -54,14 +54,15 @@ sudo apt install -y wezterm eza azure-cli
 # Install zsh puligins
 ZDOTDIR=$HOME/.config/zsh
 plugins=(
-    https://raw.githubusercontent.com/le0me55i/zsh-extract/refs/heads/master/extract.plugin.zsh
-    https://raw.githubusercontent.com/zsh-users/zsh-autosuggestions/refs/heads/master/zsh-autosuggestions.zsh
-    https://raw.githubusercontent.com/zsh-users/zsh-syntax-highlighting/refs/heads/master/zsh-syntax-highlighting.zsh
+    git@github.com:le0me55i/zsh-extract.git
+    git@github.com:zsh-users/zsh-autosuggestions.git
+    git@github.com:zsh-users/zsh-syntax-highlighting.git
 )
-for url in "${plugins[@]}"; do
-    file=$(basename $url)
-    curl --create-dirs -O --output-dir zsh/.config/zsh/plugins ${url}
-done 
+for repo in "${plugins[@]}"; do
+    dir="$ZDOTDIR/plugins/$(basename "${repo}" .git)"
+    git clone "${repo}" "${dir}"
+    rm -rf "${dir}/.git"
+done
 
 # Install completions
 completions=(
@@ -109,6 +110,7 @@ go build -C az-pim-cli -o ~/.local/bin
 rm -rf az-pim-cli
 
 # Install dotnet
+curl -L -O https://download.visualstudio.microsoft.com/download/pr/308f16a9-2ecf-4a42-b8bb-c1233de985fd/be6e87045ab21935bd8bb98ce69026c4/dotnet-sdk-9.0.100-linux-x64.tar.gz
 DOTNET_FILE=dotnet-sdk-9.0.100-linux-x64.tar.gz
 export DOTNET_ROOT=${HOME}/.dotnet
 mkdir -p "$DOTNET_ROOT" && tar zxf "$DOTNET_FILE" -C "$DOTNET_ROOT"
