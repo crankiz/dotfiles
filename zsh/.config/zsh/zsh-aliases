@@ -1,5 +1,0 @@
-#!/bin/sh
-alias ls="eza --icons --group-directories-first -la"
-alias vim="nvim"
-alias config='/usr/bin/git --git-dir=$HOME/repos/dotfiles/ --work-tree=$HOME'
-alias history="history -i"

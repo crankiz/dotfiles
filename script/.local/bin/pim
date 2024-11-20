@@ -1,0 +1,20 @@
+#!/bin/bash
+azList=$(az-pim-cli list)
+azSub=$(grep -oP '(?<=^==\s)(.+)(?=\s==$)' <<<"${azList}" | fzf)
+
+azRole=$(
+        awk "/${azSub}/ {flag=1; next} flag && /^\t/ {print; next} flag && !/^\t/ {flag=0}" <<<"${azList}" |
+                grep -oP '(\w.*$)' | sort -u | uniq | fzf
+)
+
+if [[ "${azRole}" == "Owner" || "${azRole}" == "Role Based Access Control Administrator" ]]; then
+        duration=60
+fi
+
+if [[ -z "${azRole}" ]]; then
+        az account set --subscription "${azSub}"
+        exit 0
+fi
+
+az account set --subscription "${azSub}" &&
+        az-pim-cli activate --name "${azSub}" --role "${azRole}" --duration ${duration:-600} --reason "DevOps stuff"

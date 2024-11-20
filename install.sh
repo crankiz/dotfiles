@@ -1,160 +1,114 @@
 #!/usr/bin/env bash
+# Install packages
+# List of packages to install
+packages=(
+    apt-transport-https
+    ca-certificates
+    lsb-release
+    curl
+    gpg
+    gnupg
+    git
+    stow
+    neovim
+    zsh
+    fzf
+    bat
+    zoxide  
+)
 
-###############################################################################
-# Set up Environment
-###############################################################################
-
-# Define variables
-export XDG_CONFIG_HOME=$HOME/.config
-export ZDOTDIR=$XDG_CONFIG_HOME/zsh
-
-repo_url="https://github.com/crankiz/dotfiles"
-# Dotfiles location
-target_folder="$HOME/.dotfiles"
-# List of packages to check and install
-packages=("curl" "eza" "fzf" "git" "neovim" "stow" "zsh" "bat" "jq")
-
-###############################################################################
-# Check if the script is run as root
-###############################################################################
-
-if [ "$EUID" -ne 0 ]; then
-    SUDO="sudo -H"
-else
-    SUDO=""
-fi
-
-###############################################################################
-# Function to check if a package is installed
-###############################################################################
-
-is_package_installed() {
-    command -v "$1" >/dev/null 2>&1
-}
-
-###############################################################################
-# Function to install packages using the appropriate package manager
-###############################################################################
-
-install_packages() {
-    local package_manager
-
-    # Check which package manager is available
-    if is_package_installed "apt"; then
-        package_manager="$SUDO apt install -y"
-    elif is_package_installed "dnf"; then
-        package_manager="$SUDO dnf install -y"
-    elif is_package_installed "yum"; then
-        package_manager="$SUDO yum install -y"
-    elif is_package_installed "pacman"; then
-        package_manager="$SUDO pacman -Sy --noconfirm"
-    elif is_package_installed "apk"; then
-        package_manager="$SUDO apk add"
+# Loop through the list of packages and install if not already installed
+for package in "${packages[@]}"; do
+    if ! dpkg -l | grep -q "^ii  $package "; then
+        echo "Installing $package..."
+        sudo apt install -y $package || { echo "Failed to install $package"; exit 1; }
     else
-        echo "Error: Unsupported package manager. Please install the packages manually."
-        exit 1
+        echo "$package is already installed."
     fi
+done
 
-    # Install missing packages
-    for package in "${packages[@]}"; do
-        if ! is_package_installed "$package"; then
-            echo "Installing $package..."
-            $package_manager "$package" || {
-                echo "Error: Failed to install $package."
-                exit 1
-            }
-        else
-            echo "$package is already installed."
-        fi
-    done
-}
+# Add repositories
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://apt.fury.io/wez/gpg.key                                  | sudo gpg --yes --dearmor -o /etc/apt/keyrings/wezterm-fury.gpg
+curl -fsSL https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --yes --dearmor -o /etc/apt/keyrings/gierens.gpg
+curl -fsSL https://packages.microsoft.com/keys/microsoft.asc                | sudo gpg --yes --dearmor -o /etc/apt/keyrings/microsoft.gpg
 
-###############################################################################
-# Call the install_packages function
-###############################################################################
+echo 'deb [signed-by=/etc/apt/keyrings/wezterm-fury.gpg] https://apt.fury.io/wez/ * *' | sudo tee /etc/apt/sources.list.d/wezterm.list
+echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
+sudo tee /etc/apt/sources.list.d/azure-cli.sources > /dev/null <<EOL
+Types: deb
+URIs: https://packages.microsoft.com/repos/azure-cli/
+Suites: $(lsb_release -cs)
+Components: main
+Architectures: $(dpkg --print-architecture)
+Signed-by: /etc/apt/keyrings/microsoft.gpg
+EOL
 
-install_packages
-echo "Package installation complete."
+sudo chmod 644 /etc/apt/keyrings/*.gpg
 
-###############################################################################
-# Clone and Stow Dotfiles
-###############################################################################
+sudo apt update
 
-# Check if the cloning was successful
-if git clone --recurse-submodules "$repo_url" "$target_folder"; then
-    echo "Repository cloned successfully."
-    # Change to the dotfiles directory
-    cd "$target_folder" || exit
-    # Use GNU Stow to create symlinks
-    stow -t ~ */
-    echo "Symlinks created successfully."
-else
-    echo "Error: Cloning failed."
-fi
+# Install packages from the added repositories
+sudo apt install -y wezterm eza azure-cli
 
-###############################################################################
-# Install zsh plugins and auto completion
-###############################################################################
+# Install zsh puligins
+ZDOTDIR=$HOME/.config/zsh
+plugins=(
+    https://raw.githubusercontent.com/le0me55i/zsh-extract/refs/heads/master/extract.plugin.zsh
+    https://raw.githubusercontent.com/zsh-users/zsh-autosuggestions/refs/heads/master/zsh-autosuggestions.zsh
+    https://raw.githubusercontent.com/zsh-users/zsh-syntax-highlighting/refs/heads/master/zsh-syntax-highlighting.zsh
+)
+for url in "${plugins[@]}"; do
+    file=$(basename $url)
+    curl --create-dirs -O --output-dir zsh/.config/zsh/plugins ${url}
+done 
 
-# Function to download a file using curl
-get_auto_completion() {
-    local url="$1"
-    local target_path="$2"
+# Install completions
+completions=(
+    https://raw.githubusercontent.com/le0me55i/zsh-extract/refs/heads/master/_extract
+    https://raw.githubusercontent.com/Azure/azure-cli/dev/az.completion
+)
+for url in "${completions[@]}"; do
+    file=$(basename $url)
+    curl --output "zsh/.config/zsh/completions/_${file#_}" ${url}
+done 
 
-    # Ensure the directory exists or create it
-    mkdir -p "$(dirname "$target_path")"
-
-    echo "Downloading $url to $target_path..."
-    curl -fsSL "$url" --create-dirs -o "$target_path"
-
-    if [ $? -eq 0 ]; then
-        echo "Download successful."
-    else
-        echo "Error: Download failed."
-    fi
-}
-
-git_raw="https://raw.githubusercontent.com"
-
-get_auto_completion "${git_raw}/chubin/cheat.sh/master/share/zsh.txt" "$ZDOTDIR/completions/_cht"
-get_auto_completion "${git_raw}/zsh-users/zsh-completions/master/src/_openssl" "$ZDOTDIR/completions/_openssl"
-get_auto_completion "${git_raw}/eza-community/eza/main/completions/zsh/_eza" "$ZDOTDIR/completions/_eza"
-
-###############################################################################
 # Install starship
-###############################################################################
+curl -sS https://starship.rs/install.sh | sh
 
-command -v starship > /dev/null || curl -sS https://starship.rs/install.sh | sh
+# Install layvim
+git clone https://github.com/LazyVim/starter ~/.config/nvim
+rm -rf ~/.config/nvim/.git
 
-###############################################################################
-# Install Plug (Vim plugin manager)
-###############################################################################
+# Install fonts
+declare -a fonts=(
+    FiraMono
+    JetBrainsMono
+    OpenDyslexic
+    UbuntuMono
+)
 
-sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
-       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+fontVersion="3.2.1"
+fontsDir="$HOME/.local/share/fonts"
 
-###############################################################################
-# Install Vim plugins
-###############################################################################
+for font in "${fonts[@]}"; do
+    zipFile="${font}.zip"
+    fontUrl="https://github.com/ryanoasis/nerd-fonts/releases/download/v${fontVersion}/${zipFile}"
+    echo "Downloading ${fontUrl}"
+    curl -O "$fontUrl"
+    unzip "${zipFile}" -d "${fontsDir}"
+    rm "${zipFile}"
+done
 
-# Ensure the directory exists or create it
-echo -e "\n\nInstalling Vim plugins..."
-nvim -E +PlugInstall +qall || true
+# Install go
+rm -rf /usr/local/go && tar -C /usr/local -xzf go1.23.1.linux-amd64.tar.gz
 
-###############################################################################
-# Change default shell to zsh
-###############################################################################
+# Install az-pim-cli
+git clone https://github.com/netr0m/az-pim-cli.git
+go build -C az-pim-cli -o ~/.local/bin
+rm -rf az-pim-cli
 
-$SUDO chsh -s $(which zsh) $SUDO_USER
-
-###############################################################################
-# Completion Message
-###############################################################################
-
-cat << EOF
-Everything was installed successfully!
-You can safely close this terminal.
-The next time you open your terminal, zsh will be ready to go!
-EOF
-
-exit 0
+# Install dotnet
+DOTNET_FILE=dotnet-sdk-9.0.100-linux-x64.tar.gz
+export DOTNET_ROOT=${HOME}/.dotnet
+mkdir -p "$DOTNET_ROOT" && tar zxf "$DOTNET_FILE" -C "$DOTNET_ROOT"
