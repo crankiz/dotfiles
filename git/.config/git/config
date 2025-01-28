@@ -1,3 +1,13 @@
 [user]
-	email = svedberg.tobias@gmail.com
-	name = Tobias Svedberg
+  email = svedberg.tobias@gmail.com
+  name = Tobias Svedberg
+
+[core]
+	editor = nvim
+	whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol
+
+[alias]
+  default-branch = "!git symbolic-ref refs/remotes/origin/HEAD --short | cut -d'/' -f 2"
+  checkout-default-branch = "!git checkout $(git default-branch)"
+  delete-merged-branches = "!git branch --merged | grep -v $(git default-branch) | xargs git branch -d"
+  clean-default = "!git checkout-default-branch && git delete-merged-branches && git fetch && git remote prune origin && git pull"

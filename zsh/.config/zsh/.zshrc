@@ -90,7 +90,6 @@ export DISTRO=$(awk -F '=' '/^ID=/ {print $2}' /etc/*-release)
 alias ls="eza --icons --group-directories-first -la"
 alias vim="nvim"
 alias history="history -i"
-alias git-clean-main="git checkout main && git branch -D \$(git branch | grep -v 'main') && git fetch && git remote prune origin && git pull"
 
 # ~~~~~~ KEY BINDINGS ~~~~~~
 bindkey -e  # Set Emacs key bindings (default)
