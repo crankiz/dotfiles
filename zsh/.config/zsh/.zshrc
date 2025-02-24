@@ -16,8 +16,8 @@ setopt GLOB_COMPLETE
 
 # Correction 
 setopt AUTO_CD
+unsetopt CORRECT_ALL
 setopt CORRECT
-setopt CORRECT_ALL
 
 # History
 setopt SHARE_HISTORY
